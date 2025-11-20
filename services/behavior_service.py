@@ -1,4 +1,4 @@
-from database import (
+from db.database import (
     get_behavior_prompt, 
     set_behavior_prompt, 
     get_all_behavior_prompts, 

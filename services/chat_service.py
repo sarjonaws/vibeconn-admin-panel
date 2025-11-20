@@ -1,4 +1,4 @@
-from database import get_chat_history, get_chat_sessions, get_api_requests
+from db.database import get_chat_history, get_chat_sessions, get_api_requests
 
 def get_all_chat_sessions():
     return get_chat_sessions()

@@ -1,4 +1,4 @@
-from vault_client import vault_client
+from utils.vault_client import vault_client
 
 def is_vault_authenticated():
     return vault_client.is_authenticated()
