@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 import json
 
-DB_URL = os.getenv("DATABASE_URL", "postgresql://envadmin:envadmin@localhost:5432/envadmindb")
+DB_URL = os.getenv("DATABASE_URL", "")
 
 engine = create_engine(DB_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
