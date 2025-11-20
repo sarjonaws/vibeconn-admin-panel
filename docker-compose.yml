@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  dbenvadmin:
+    image: postgres:15-alpine
+    container_name: envadmin
+    environment:
+      POSTGRES_USER: envadmin
+      POSTGRES_PASSWORD: envadmin
+      POSTGRES_DB: envadmindb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

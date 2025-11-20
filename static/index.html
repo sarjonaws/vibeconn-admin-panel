@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeConnections Admin Panel</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>⚡ VibeConnections</h1>
+            <p>Admin Panel v1.0</p>
+        </div>
+        <div class="nav-item active" onclick="showTab('dashboard')">📊 Dashboard</div>
+        <div class="nav-item" onclick="showTab('vault')">🔐 Vault Secrets</div>
+        <div class="nav-item" onclick="showTab('behavior')">🎭 Comportamiento</div>
+        <div class="nav-item" onclick="showTab('agents')">🤖 Agentes Expertos</div>
+        <div class="nav-item" onclick="showTab('documents')">📄 Documentos</div>
+        <div class="nav-item" onclick="showTab('query')">💬 Consultas</div>
+        <div class="nav-item" onclick="showTab('requests')">📊 Peticiones API</div>
+        <div class="nav-item" onclick="showTab('docs')">📚 Documentación</div>
+    </div>
+    
+    <div class="main">
+        <div class="header">
+            <h2 id="page-title">Dashboard</h2>
+            <div style="display:flex;align-items:center;gap:12px;">
+                <button id="help-btn" class="btn-help" onclick="showContextHelp()" title="Ayuda de esta sección">❓ Ayuda</button>
+                <div class="status-bar" id="status"></div>
+            </div>
+        </div>
+        
+        <div id="dashboard" class="tab-content active"></div>
+        <div id="vault" class="tab-content"></div>
+        <div id="behavior" class="tab-content"></div>
+        <div id="agents" class="tab-content"></div>
+        <div id="documents" class="tab-content"></div>
+        <div id="query" class="tab-content"></div>
+        <div id="requests" class="tab-content"></div>
+        <div id="docs" class="tab-content"></div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    <div class="loading-overlay" id="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <span id="loading-text">Procesando...</span>
+        </div>
+    </div>
+    
+    <div id="help-modal" class="help-modal">
+        <div class="help-content">
+            <span class="close" onclick="closeHelp()">&times;</span>
+            <div id="help-body"></div>
+        </div>
+    </div>
+    
+    <!-- Bulk Edit Modal -->
+    <div class="modal fade" id="bulkEditModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#f9fafb;border-bottom:1px solid #e5e7eb;">
+                    <h5 class="modal-title" style="display:flex;align-items:center;gap:8px;">
+                        <i class="bi bi-pencil-square" style="color:#3b82f6;"></i>
+                        <span id="bulk-edit-modal-title">Editar Variables en Masa</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding:24px;">
+                    <input type="hidden" id="bulk-edit-service">
+                    <div class="alert alert-info" style="display:flex;align-items:start;gap:12px;margin-bottom:16px;">
+                        <i class="bi bi-info-circle" style="font-size:20px;flex-shrink:0;"></i>
+                        <div style="font-size:13px;">
+                            <strong>Formato:</strong> Escribe cada variable en una línea separada con el formato <code>CLAVE=valor</code>
+                            <br><strong>Ejemplo:</strong>
+                            <pre style="background:#f8f9fa;padding:8px;border-radius:4px;margin-top:8px;margin-bottom:0;">OPENAI_API_KEY=sk-abc123
+ANTHROPIC_API_KEY=sk-ant-xyz789
+DATABASE_URL=postgresql://localhost/db</pre>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" style="font-weight:600;color:#374151;font-size:13px;display:flex;justify-content:space-between;align-items:center;">
+                            <span><i class="bi bi-code-square"></i> Variables de Entorno</span>
+                            <span id="bulk-edit-count" style="font-size:12px;color:#6b7280;font-weight:400;">0 variables</span>
+                        </label>
+                        <textarea 
+                            class="form-control" 
+                            id="bulk-edit-textarea" 
+                            rows="15" 
+                            placeholder="CLAVE1=valor1&#10;CLAVE2=valor2&#10;CLAVE3=valor3"
+                            style="font-family:'Courier New',monospace;font-size:13px;resize:vertical;"
+                            oninput="validateBulkEdit()"></textarea>
+                        <div id="bulk-edit-errors" style="margin-top:8px;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background:#f9fafb;border-top:1px solid #e5e7eb;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="save-bulk-edit-btn">
+                        <i class="bi bi-check-circle"></i> Guardar Todas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/config.js"></script>
+    <script src="/static/js/vault.js"></script>
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/documents.js"></script>
+    <script src="/static/js/agents.js"></script>
+    <script src="/static/js/chat.js"></script>
+    <script src="/static/js/requests.js"></script>
+    <script src="/static/js/docs.js"></script>
+    <script src="/static/js/help.js"></script>
+    <script src="/static/js/views.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
