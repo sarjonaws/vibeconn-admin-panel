@@ -1,7 +1,7 @@
 import httpx
 import os
 import time
-from database import get_behavior_prompt, get_all_agents, save_chat_message, save_api_request
+from db.database import get_behavior_prompt, get_all_agents, save_chat_message, save_api_request
 
 SEMANTIC_URL = os.getenv("SEMANTIC_URL", "http://localhost:8001")
 

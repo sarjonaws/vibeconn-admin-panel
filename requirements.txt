@@ -7,3 +7,5 @@ python-multipart==0.0.6
 sqlalchemy==2.0.23
 psycopg2-binary==2.9.9
 hvac==2.1.0
+alembic==1.13.1
+python-dotenv==1.0.0
