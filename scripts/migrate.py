@@ -3,6 +3,7 @@ Script de gestión de migraciones
 """
 import os
 import sys
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,32 +11,35 @@ load_dotenv()
 from alembic.config import Config
 from alembic import command
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+CONFIG_PATH = BASE_DIR / "config" / "alembic.ini"
+
 def run_migrations():
     """Ejecuta todas las migraciones pendientes"""
-    alembic_cfg = Config("../config/alembic.ini")
+    alembic_cfg = Config(str(CONFIG_PATH))
     command.upgrade(alembic_cfg, "head")
     print("✓ Migraciones aplicadas exitosamente")
 
 def create_migration(message: str):
     """Crea una nueva migración automática"""
-    alembic_cfg = Config("../config/alembic.ini")
+    alembic_cfg = Config(str(CONFIG_PATH))
     command.revision(alembic_cfg, message=message, autogenerate=True)
     print(f"✓ Migración '{message}' creada")
 
 def downgrade(revision: str = "-1"):
     """Revierte migraciones"""
-    alembic_cfg = Config("../config/alembic.ini")
+    alembic_cfg = Config(str(CONFIG_PATH))
     command.downgrade(alembic_cfg, revision)
     print(f"✓ Revertido a revisión {revision}")
 
 def show_current():
     """Muestra la revisión actual"""
-    alembic_cfg = Config("../config/alembic.ini")
+    alembic_cfg = Config(str(CONFIG_PATH))
     command.current(alembic_cfg)
 
 def show_history():
     """Muestra el historial de migraciones"""
-    alembic_cfg = Config("../config/alembic.ini")
+    alembic_cfg = Config(str(CONFIG_PATH))
     command.history(alembic_cfg)
 
 if __name__ == "__main__":
