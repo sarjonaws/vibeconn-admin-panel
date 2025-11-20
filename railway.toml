@@ -1,0 +1,25 @@
+[build]
+builder = "nixpacks"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+startCommand = "python scripts/migrate.py upgrade && uvicorn app:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[[services]]
+name = "admin-panel"
+
+[services.env]
+PORT = "9000"
+COMPRESS_URL = "${{COMPRESS_URL}}"
+VECTOR_URL = "${{VECTOR_URL}}"
+SEMANTIC_URL = "${{SEMANTIC_URL}}"
+VAULT_ADDR = "${{VAULT_ADDR}}"
+VAULT_TOKEN = "${{VAULT_TOKEN}}"
+VAULT_MOUNT_POINT = "kv"
+
+[services.database]
+type = "postgresql"

@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.git/
+.gitignore
+*.log
+db/db_export.json
+docs/
+clean_start.bat
+setup_db.bat
+setup_db.sh
+start_admin.bat
+README.md
