@@ -1,11 +1,14 @@
 import httpx
 import os
-from database import get_all_configs, set_config
+from db.database import get_all_configs, set_config
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SERVICES = {
-    "compress": os.getenv("COMPRESS_URL", "http://localhost:8002"),
-    "vector": os.getenv("VECTOR_URL", "http://localhost:8000"),
-    "semantic": os.getenv("SEMANTIC_URL", "http://localhost:8001")
+    "compress": os.getenv("COMPRESS_URL", ""),
+    "vector": os.getenv("VECTOR_URL", ""),
+    "semantic": os.getenv("SEMANTIC_URL", "")
 }
 
 async def get_all_service_configs(refresh: bool = False):

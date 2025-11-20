@@ -19,11 +19,7 @@ pip install -q -r requirements.txt
 
 echo.
 echo Inicializando BD (si es necesario)...
-python init_db.py
-
-@REM echo.
-@REM echo Sincronizando configuracion a servicios...
-@REM python sync_config.py
+python db\init_db.py
 
 echo.
 echo ========================================
@@ -32,4 +28,4 @@ echo   http://localhost:9000
 echo ========================================
 echo.
 
-uvicorn app:app --host 0.0.0.0 --port 9000 --reload
+uvicorn app:app --host 0.0.0.0 --port 9000

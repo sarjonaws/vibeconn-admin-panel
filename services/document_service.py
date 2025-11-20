@@ -1,6 +1,6 @@
 import httpx
 import os
-from file_processor import process_file
+from utils.file_processor import process_file
 
 VECTOR_URL = os.getenv("VECTOR_URL", "http://localhost:8000")
 

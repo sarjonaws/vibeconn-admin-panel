@@ -5,7 +5,14 @@ from datetime import datetime
 import os
 import json
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 DB_URL = os.getenv("DATABASE_URL", "")
+
+if not DB_URL:
+    raise ValueError("DATABASE_URL no configurado en .env")
 
 engine = create_engine(DB_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -56,7 +63,9 @@ class ApiRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 def init_db():
-    Base.metadata.create_all(bind=engine)
+    """Inicializar BD - Usar migraciones en su lugar"""
+    # Base.metadata.create_all(bind=engine)
+    pass  # Usar: python migrate.py upgrade
 
 def get_db():
     db = SessionLocal()
@@ -195,4 +204,4 @@ def get_api_requests(limit: int = 50):
     db.close()
     return [{"id": r.id, "session_id": r.session_id, "full_prompt": r.full_prompt, "response": r.response, "tokens_used": r.tokens_used, "response_time_ms": r.response_time_ms, "model": r.model, "created_at": r.created_at.isoformat()} for r in requests]
 
-init_db()
+# init_db()  # Comentado - usar migraciones: python migrate.py upgrade
