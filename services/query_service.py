@@ -5,7 +5,7 @@ from db.database import get_behavior_prompt, get_all_agents, save_chat_message, 
 
 SEMANTIC_URL = os.getenv("SEMANTIC_URL", "http://localhost:8001")
 
-async def ask_question(query: str, user_id: str, language: str, agent_id: int = None, max_tokens: int = 2000):
+async def ask_question(query: str, user_id: str, language: str, agent_id: int = None, document_id: str = None, max_tokens: int = 2000):
     start_time = time.time()
     
     # Get behavior prompt from agent or default
@@ -33,7 +33,13 @@ async def ask_question(query: str, user_id: str, language: str, agent_id: int = 
     
     # Save to chat history
     session_id = user_id or "default"
-    save_chat_message(session_id, query, result.get("answer", ""))
+    agent_name = None
+    if agent_id:
+        agents = get_all_agents()
+        agent = next((a for a in agents if a['id'] == agent_id), None)
+        agent_name = agent['name'] if agent else None
+    print(f"Saving chat message with document_id: {document_id}")
+    save_chat_message(session_id, query, result.get("answer", ""), agent_name, document_id)
     
     # Save API request details
     metadata = result.get("metadata", {})

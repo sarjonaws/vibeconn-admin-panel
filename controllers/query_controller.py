@@ -10,6 +10,7 @@ class QueryRequest(BaseModel):
     user_id: str = "admin"
     language: str = "es"
     agent_id: Optional[int] = None
+    document_id: Optional[str] = None
     max_tokens: Optional[int] = 2000
 
 @router.post("/ask")
@@ -19,7 +20,8 @@ async def ask_question_endpoint(query: QueryRequest):
             query.query, 
             query.user_id, 
             query.language, 
-            query.agent_id, 
+            query.agent_id,
+            query.document_id,
             query.max_tokens
         )
         return result

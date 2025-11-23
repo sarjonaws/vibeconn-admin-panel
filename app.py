@@ -14,6 +14,7 @@ from controllers.chat_controller import router as chat_router
 from controllers.behavior_controller import router as behavior_router
 from controllers.agent_controller import router as agent_router
 from controllers.vault_controller import router as vault_router
+from controllers.tracking_controller import router as tracking_router
 
 app = FastAPI(title="VibeConnections Admin")
 
@@ -36,6 +37,7 @@ app.include_router(chat_router)
 app.include_router(behavior_router)
 app.include_router(agent_router)
 app.include_router(vault_router)
+app.include_router(tracking_router)
 
 @app.get("/", response_class=HTMLResponse)
 async def root():

@@ -218,6 +218,20 @@ const VIEWS = {
         </div>
     `,
     
+    tracking: `
+        <div class="card">
+            <div class="card-title">⏱️ Análisis de Cuellos de Botella</div>
+            <div style="margin-bottom:16px;"><button onclick="loadBottlenecks()" class="btn-sm">🔄 Actualizar</button></div>
+            <table class="table"><thead><tr><th>Paso</th><th>Promedio</th><th>Mínimo</th><th>Máximo</th><th>Peticiones</th><th>Errores</th></tr></thead><tbody id="bottlenecks-tbody"></tbody></table>
+        </div>
+        <div class="card">
+            <div class="card-title">📊 Últimos Traces</div>
+            <div style="margin-bottom:16px;"><button onclick="loadTraces()" class="btn-sm">🔄 Actualizar</button></div>
+            <table class="table"><thead><tr><th>Trace ID</th><th>Query</th><th>Tiempo Total</th><th>Estado</th><th>Fecha</th></tr></thead><tbody id="traces-tbody"></tbody></table>
+        </div>
+        <div class="card" id="trace-detail" style="display:none;"></div>
+    `,
+    
     docs: '' // Will be rendered by docs.js
 };
 

@@ -49,6 +49,7 @@ class ChatHistory(Base):
     user_message = Column(Text, nullable=False)
     assistant_message = Column(Text, nullable=False)
     agent_name = Column(String)
+    document_id = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
 class ApiRequest(Base):
@@ -61,6 +62,12 @@ class ApiRequest(Base):
     response_time_ms = Column(Float)
     model = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class SessionState(Base):
+    __tablename__ = "session_state"
+    session_id = Column(String, primary_key=True)
+    current_document_id = Column(String, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 def init_db():
     """Inicializar BD - Usar migraciones en su lugar"""
@@ -164,9 +171,9 @@ def get_active_agent():
     db.close()
     return {"id": agent.id, "name": agent.name, "topic": agent.topic, "system_prompt": agent.system_prompt, "document_filters": agent.document_filters, "temperature": agent.temperature} if agent else None
 
-def save_chat_message(session_id: str, user_message: str, assistant_message: str, agent_name: str = None):
+def save_chat_message(session_id: str, user_message: str, assistant_message: str, agent_name: str = None, document_id: str = None):
     db = SessionLocal()
-    msg = ChatHistory(session_id=session_id, user_message=user_message, assistant_message=assistant_message, agent_name=agent_name)
+    msg = ChatHistory(session_id=session_id, user_message=user_message, assistant_message=assistant_message, agent_name=agent_name, document_id=document_id)
     db.add(msg)
     db.commit()
     db.close()
@@ -178,7 +185,7 @@ def get_chat_history(session_id: str = None, limit: int = 50):
         query = query.filter(ChatHistory.session_id == session_id)
     messages = query.order_by(ChatHistory.created_at.desc()).limit(limit).all()
     db.close()
-    return [{"id": m.id, "session_id": m.session_id, "user_message": m.user_message, "assistant_message": m.assistant_message, "agent_name": m.agent_name, "created_at": m.created_at.isoformat()} for m in messages]
+    return [{"id": m.id, "session_id": m.session_id, "user_message": m.user_message, "assistant_message": m.assistant_message, "agent_name": m.agent_name, "document_id": m.document_id, "created_at": m.created_at.isoformat()} for m in messages]
 
 def get_chat_sessions():
     db = SessionLocal()
@@ -190,6 +197,15 @@ def get_chat_sessions():
     ).group_by(ChatHistory.session_id).order_by(func.max(ChatHistory.created_at).desc()).all()
     db.close()
     return [{"session_id": s[0], "first_message": s[1].isoformat(), "last_message": s[2].isoformat(), "message_count": s[3]} for s in sessions]
+
+def delete_chat_session(session_id: str):
+    db = SessionLocal()
+    # Eliminar historial de chat
+    db.query(ChatHistory).filter(ChatHistory.session_id == session_id).delete()
+    # Eliminar estado de sesión (documento asociado)
+    db.query(SessionState).filter(SessionState.session_id == session_id).delete()
+    db.commit()
+    db.close()
 
 def save_api_request(session_id: str, full_prompt: str, response: str, tokens_used: int, response_time_ms: float, model: str):
     db = SessionLocal()
@@ -203,5 +219,24 @@ def get_api_requests(limit: int = 50):
     requests = db.query(ApiRequest).order_by(ApiRequest.created_at.desc()).limit(limit).all()
     db.close()
     return [{"id": r.id, "session_id": r.session_id, "full_prompt": r.full_prompt, "response": r.response, "tokens_used": r.tokens_used, "response_time_ms": r.response_time_ms, "model": r.model, "created_at": r.created_at.isoformat()} for r in requests]
+
+    return [{"id": r.id, "session_id": r.session_id, "full_prompt": r.full_prompt, "response": r.response, "tokens_used": r.tokens_used, "response_time_ms": r.response_time_ms, "model": r.model, "created_at": r.created_at.isoformat()} for r in requests]
+
+def get_session_state(session_id: str):
+    db = SessionLocal()
+    state = db.query(SessionState).filter(SessionState.session_id == session_id).first()
+    db.close()
+    return state
+
+def update_session_document(session_id: str, document_id: str):
+    db = SessionLocal()
+    state = db.query(SessionState).filter(SessionState.session_id == session_id).first()
+    if not state:
+        state = SessionState(session_id=session_id)
+        db.add(state)
+    
+    state.current_document_id = document_id
+    db.commit()
+    db.close()
 
 # init_db()  # Comentado - usar migraciones: python migrate.py upgrade
