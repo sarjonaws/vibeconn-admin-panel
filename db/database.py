@@ -69,10 +69,21 @@ class SessionState(Base):
     current_document_id = Column(String, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+class RequestTrace(Base):
+    __tablename__ = "request_traces"
+    trace_id = Column(String, primary_key=True)
+    query = Column(Text)
+    user_id = Column(String)
+    total_time_ms = Column(Float)
+    success = Column(Boolean)
+    error = Column(Text, nullable=True)
+    steps = Column(Text)  # JSON string
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 def init_db():
-    """Inicializar BD - Usar migraciones en su lugar"""
-    # Base.metadata.create_all(bind=engine)
-    pass  # Usar: python migrate.py upgrade
+    """Inicializar BD"""
+    Base.metadata.create_all(bind=engine)
+    # pass  # Usar: python migrate.py upgrade
 
 def get_db():
     db = SessionLocal()

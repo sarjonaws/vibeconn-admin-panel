@@ -15,8 +15,13 @@ from controllers.behavior_controller import router as behavior_router
 from controllers.agent_controller import router as agent_router
 from controllers.vault_controller import router as vault_router
 from controllers.tracking_controller import router as tracking_router
+from db.database import init_db
 
 app = FastAPI(title="VibeConnections Admin")
+
+@app.on_event("startup")
+def on_startup():
+    init_db()
 
 # Configuración de CORS
 origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
