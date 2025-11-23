@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from controllers.config_controller import router as config_router
 from controllers.document_controller import router as document_router
@@ -12,6 +16,17 @@ from controllers.agent_controller import router as agent_router
 from controllers.vault_controller import router as vault_router
 
 app = FastAPI(title="VibeConnections Admin")
+
+# Configuración de CORS
+origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Register routers
 app.include_router(config_router)
