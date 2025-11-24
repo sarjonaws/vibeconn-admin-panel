@@ -24,7 +24,16 @@ def on_startup():
     init_db()
 
 # Configuración de CORS
-origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+# Configuración de CORS
+raw_origins = os.getenv("ALLOWED_ORIGINS", "*")
+origins = [origin.strip().strip('"').strip("'") for origin in raw_origins.split(",")]
+
+# Add common local development origins if not present
+if "*" not in origins:
+    dev_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    for dev_origin in dev_origins:
+        if dev_origin not in origins:
+            origins.append(dev_origin)
 
 app.add_middleware(
     CORSMiddleware,

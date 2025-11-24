@@ -67,6 +67,7 @@ class SessionState(Base):
     __tablename__ = "session_state"
     session_id = Column(String, primary_key=True)
     current_document_id = Column(String, nullable=True)
+    custom_behavior = Column(Text, nullable=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 class RequestTrace(Base):

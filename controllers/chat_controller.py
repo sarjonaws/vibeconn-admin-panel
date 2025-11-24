@@ -28,6 +28,33 @@ async def update_session_document_endpoint(session_id: str, body: SessionDocumen
     set_session_document(session_id, body.document_id)
     return {"status": "success", "current_document_id": body.document_id}
 
+class SessionBehavior(BaseModel):
+    behavior: Optional[str]
+
+@router.put("/chat/sessions/{session_id}/behavior")
+async def update_session_behavior_endpoint(session_id: str, body: SessionBehavior):
+    from db.database import get_db, SessionState
+    from sqlalchemy import update
+    
+    db = next(get_db())
+    try:
+        # Update or create session state with custom behavior
+        stmt = update(SessionState).where(SessionState.session_id == session_id).values(
+            custom_behavior=body.behavior
+        )
+        result = db.execute(stmt)
+        
+        if result.rowcount == 0:
+            # Create new session state if doesn't exist
+            from db.database import SessionState
+            session_state = SessionState(session_id=session_id, custom_behavior=body.behavior)
+            db.add(session_state)
+        
+        db.commit()
+        return {"status": "success", "behavior": body.behavior}
+    finally:
+        db.close()
+
 @router.delete("/chat/sessions/{session_id}")
 async def delete_chat_session_endpoint(session_id: str):
     delete_session(session_id)
