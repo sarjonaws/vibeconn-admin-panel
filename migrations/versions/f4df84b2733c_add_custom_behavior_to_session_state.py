@@ -38,8 +38,8 @@ def upgrade() -> None:
     op.alter_column('request_traces', 'steps',
                existing_type=sa.TEXT(),
                nullable=True)
-    op.drop_index('idx_traces_created_at', table_name='request_traces')
-    op.drop_index('idx_traces_trace_id', table_name='request_traces')
+    op.drop_index('idx_traces_created_at', table_name='request_traces', if_exists=True)
+    op.drop_index('idx_traces_trace_id', table_name='request_traces', if_exists=True)
     op.drop_constraint('request_traces_trace_id_key', 'request_traces', type_='unique')
     op.drop_column('request_traces', 'id')
     op.add_column('session_state', sa.Column('custom_behavior', sa.Text(), nullable=True))
